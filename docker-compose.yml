@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  phuot-backend-1:
+    image: nginx:alpine
+    container_name: phuot-backend-1
+    restart: always
+
+  phuot-backend-2:
+    image: nginx:alpine
+    container_name: phuot-backend-2
+    restart: always
+
+  loadbalancer:
+    image: nginx:alpine
+    container_name: phuot-loadbalancer
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - phuot-backend-1
+      - phuot-backend-2
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: phuot-tunnel
+    restart: always
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=eyJhIjoiMTI5MTI5NWJjYzIzMWQ3MTgxY2E0NzVmNzEwNDIyMjIiLCJ0IjoiZTNjNzhmY2QtMzFlZC00NjIwLWI2MzUtYWYzYzQ1ZWYxMWRlIiwicyI6Ik1HUTJNamsxT1dFdE5XSXlOQzAwT1dOaExXRXdOMkl0TURrME5tTmtaREl5WlRNMiJ9
